@@ -11,6 +11,7 @@ main source file
 */
 #include "project.h"
 #include "InterruptRoutines.h"
+#include "RegAddress.h"
 
 volatile uint8 ReadValue;
 
@@ -20,7 +21,7 @@ volatile uint8 ReadValue;
 #define WHO_AM_I 2
 #define LDR_CHANNEL 0
 #define TMP_CHANNEL 1
-#define AVERAGE_SAMPLES 5
+#define AVERAGE_SAMPLES 5 //maybe we have to keep this value from the control reg2 
 
 
 uint8 slaveBuffer[SLAVE_BUFFER_SIZE];
@@ -56,14 +57,19 @@ int main(void)
     
     ReadValue = 0; // set to zeto the flag to read the value 
     
-    slaveBuffer[WHO_AM_I] = 0xBC; // Set who am i register value
+    slaveBuffer[WHO_AM_I] = SLAVE_WHOAMI_VALUE; // Set who am i register value
+    slaveBuffer[CTRL_REG1] = SLAVE_NORMAL_MODE_OFF_CTRL_REG1; //set control reg 1 with status bits = 0
     
     //set EZI2C buffer
     //SLAVE_BUFFER_SIZE - 4 is the third position, the boundary of the r/w cells 
     EZI2C_SetBuffer1(SLAVE_BUFFER_SIZE, SLAVE_BUFFER_SIZE - 4, slaveBuffer);  
     
     for (;;)
+    
     {
+        
+        
+        
         if (ReadValue == 1)
         {
             // Read the value of the photodetector
@@ -94,17 +100,13 @@ int main(void)
             {
                 average_mv_LDR = sum_mv_LDR / AVERAGE_SAMPLES;
                 average_digit_LDR = sum_digit_LDR / AVERAGE_SAMPLES;
-                slaveBuffer[3]= average_digit_LDR >> 8; // save in the 4th register the MSB of the average
-                slaveBuffer[4]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
-                
                 
                 sprintf(message, "LDR: %ld\r\n", average_mv_LDR); //check on the uart if the sampling is ok
                 UART_PutString(message);
                 
                 average_mv_TMP = sum_mv_TMP / AVERAGE_SAMPLES;
                 average_digit_TMP = sum_digit_TMP / AVERAGE_SAMPLES;
-                slaveBuffer[5]= average_digit_LDR >> 8; // save in the 6th register the MSB of the average
-                slaveBuffer[6]= average_digit_LDR & 0xFF; // save in the 7th register the LSB of the average
+                
                 
                 sprintf(message, "Tmp: %ld\r\n", average_mv_TMP); //check on the uart if the sampling is ok
                 UART_PutString(message);
@@ -118,6 +120,40 @@ int main(void)
             ReadValue = 0;
             
         }
+        
+        if (slaveBuffer[CTRL_REG1] == SLAVE_BOTH_MODE_ON_CTRL_REG1){
+            
+            slaveBuffer[3]= average_digit_LDR >> 8; // save in the 4th register the MSB of the average
+            slaveBuffer[4]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
+            slaveBuffer[5]= average_digit_TMP >> 8; // save in the 6th register the MSB of the average
+            slaveBuffer[6]= average_digit_TMP & 0xFF; // save in the 7th register the LSB of the average
+            Pin_LED_Write(1); // turn the led on
+        }
+        
+        else if (slaveBuffer[CTRL_REG1] == SLAVE_TMP_ON_CTRL_REG1){
+            slaveBuffer[3] = 0x00; // save 0 because we have no sampling
+            slaveBuffer[4] = 0x00; // save 0 because we have no sampling
+            slaveBuffer[5]= average_digit_TMP >> 8; // save in the 6th register the MSB of the average
+            slaveBuffer[6]= average_digit_TMP & 0xFF; // save in the 7th register the LSB of the average
+            Pin_LED_Write(0);
+        }
+        
+        else if (slaveBuffer[CTRL_REG1] == SLAVE_LDR_ON_CTRL_REG1) {
+            slaveBuffer[3]= average_digit_LDR >> 8; // save in the 4th register the MSB of the average
+            slaveBuffer[4]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
+            slaveBuffer[5] = 0x00; // save 0 because we have no sampling
+            slaveBuffer[6] = 0x00; // save 0 because we have no sampling
+            Pin_LED_Write(0);
+        }
+        
+        else if (slaveBuffer[CTRL_REG1] == SLAVE_LDR_ON_CTRL_REG1) {
+            slaveBuffer[3] = 0x00; // save 0 because we have no sampling
+            slaveBuffer[4] = 0x00; // save 0 because we have no sampling
+            slaveBuffer[5] = 0x00; // save 0 because we have no sampling
+            slaveBuffer[6] = 0x00; // save 0 because we have no sampling
+            Pin_LED_Write(0);
+        }
+            
     }
 }
 

@@ -19,7 +19,7 @@ CY_ISR_PROTO(Custom_ISR_ADC){
     
     Timer_ReadStatusRegister();
     
-    ReadValue = 1;  //Set the flag active to read the value
+    ReadValue = 1;  //Set the flag active to read the value from the ADC
  
 }
 
