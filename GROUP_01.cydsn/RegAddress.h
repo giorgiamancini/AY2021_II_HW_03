@@ -10,8 +10,8 @@ file to define values of registers
  * ========================================
 */
 
-#ifndef __SLAVE_H
-    #define __SLAVE_H
+#ifndef __REGADDRESS_H
+    #define __REGADDRESS_H
 
     /**
     *   \brief 7-bit I2C address of the slave device.
@@ -31,32 +31,37 @@ file to define values of registers
     /**
     *   \brief Address of the Control register 1
     */
-    #define SLAVE_ADR_CTRL_REG1 0x00
+    #define SLAVE_CTRL_REG1_ADDRESS 0x00
     
     /**
     *   \brief Address of the Control register 2
     */
-    #define SLAVE_ADR_CTRL_REG2 0x01
+    #define SLAVE_CTRL_REG2_ADDRESS 0x01
 
     /**
     *   \brief 8 bit to set 5 samples and no sampling (status bit 1 = 0, status bit 0 = 0)
     **/
-    #define SLAVE_NORMAL_MODE_OFF_CTRL_REG1 0x14
+    #define SLAVE_MODE_OFF_CTRL_REG1 0x00
     
     /**
     *   \brief 8 bit to set 5 samples and the LDR sampling on (status bit 1 = 0, status bit 0 = 1)
     **/
-    #define SLAVE_LDR_ON_CTRL_REG1 0x15
+    #define SLAVE_LDR_ON_CTRL_REG1 0x01
     
     /**
     *   \brief 8 bit to set 5 samples and the TMP sampling on (status bit 1 = 1, status bit 0 = 0)
     **/
-    #define SLAVE_TMP_ON_CTRL_REG1 0x16
+    #define SLAVE_TMP_ON_CTRL_REG1 0x02
     
     /**
     *   \brief 8 bit to set 5 samples and sampling both LDR and TMP (status bit 1 = 1, status bit 0 = 1)
     **/
-    #define SLAVE_BOTH_MODE_ON_CTRL_REG1 0x17
+    #define SLAVE_BOTH_ON_CTRL_REG1 0x03
+    
+    /**
+    *   \brief 8 bit frequency timer value of the Control Register 2
+    **/
+    #define SLAVE_FREQUENCY_CTRL_REG2 0x32 
     
 #endif
 
