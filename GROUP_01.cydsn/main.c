@@ -9,34 +9,43 @@ main source file
  
  * ========================================
 */
+
+//Include necessary headers and libraries
 #include "project.h"
 #include "InterruptRoutines.h"
 #include "RegAddress.h"
 #include "stdio.h"
 
-volatile uint8 ReadValue = 0; // set to zeto the flag to read the value ;
+//Define structure of slave buffer
+#define SLAVE_BUFFER_SIZE 7     //number of registers
+#define CTRL_REG1 0             //position of control register 1
+#define CTRL_REG2 1             //position of control register 2
+#define WHO_AM_I 2              //position of who am i register
+#define MSB1 3                  //position for Most Significant Byte of the first sensor average
+#define LSB1 4                  //position for Less Significant Byte of the first sensor average
+#define MSB2 5                  //position for Most Significant Byte of the second sensor average
+#define LSB2 6                  //position for Less Significant Byte of the second sensor average
 
-#define SLAVE_BUFFER_SIZE 7
-#define CTRL_REG1 0
-#define CTRL_REG2 1
-#define WHO_AM_I 2
-#define MSB1 3
-#define LSB1 4
-#define MSB2 5
-#define LSB2 6
-
+//Define slaveBuffer of the EZI2C
 uint8 slaveBuffer[SLAVE_BUFFER_SIZE];
 
-int32 sum_digit_LDR;
-int32 sum_digit_TMP;
-int32 average_digit_LDR;
-int32 average_digit_TMP;
-uint8_t num_samples = 0;
+//Define the flag to read the value from the ADC and set it to 0
+volatile uint8 ReadValue = 0; 
 
-uint8_t average_samples; 
-uint8_t status_bits;
+int32 sum_digit_LDR;            //sum in digit of LDR sensor
+int32 sum_digit_TMP;            //sum in digit of TMP sensor
+int32 average_digit_LDR;        //average in digit of LDR sensor
+int32 average_digit_TMP;        //average in digit of LDR sensor
+uint8_t num_samples = 0;        //counter to count the number of sample to consider for the average
 
-char message[20] = {'\0'};
+uint8_t average_samples;        //number of samples for the average  
+uint8_t status_bits;            //values of the status bit to activate the right channel
+
+//char message[20] = {'\0'};
+
+/***************************************
+*                main
+***************************************/
 
 int main(void)
 {
@@ -56,9 +65,6 @@ int main(void)
     slaveBuffer[CTRL_REG1] = SLAVE_MODE_OFF_CTRL_REG1; //set control reg 1 with status bits = 0 and number of samples = 5
     slaveBuffer[CTRL_REG2] = SLAVE_FREQUENCY_CTRL_REG2; //set control reg 2 with frequency at 50 Hz
     
-    //set the databuffer header and tail
-    DataBuffer[0] = 0xA0;
-    DataBuffer[TRANSMIT_BUFFER_SIZE-1] = 0xC0;
     
     //set EZI2C buffer
     //SLAVE_BUFFER_SIZE - 4 is the third position, the boundary of the r/w cells 
@@ -98,13 +104,6 @@ int main(void)
                         slaveBuffer[LSB1]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
                         slaveBuffer[MSB2]= average_digit_TMP >> 8; // save in the 6th register the MSB of the average
                         slaveBuffer[LSB2]= average_digit_TMP & 0xFF; // save in the 7th register the LSB of the average
-                        
-                        DataBuffer[1]= slaveBuffer[MSB1]; 
-                        DataBuffer[2]= slaveBuffer[LSB1]; 
-                        DataBuffer[3]= slaveBuffer[MSB2];
-                        DataBuffer[4]= slaveBuffer[LSB2];
-                        
-                        UART_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE);
 
                         sum_digit_LDR = 0;
                         sum_digit_TMP = 0;
@@ -135,18 +134,11 @@ int main(void)
                         //sprintf(message, "Tmp: %ld\r\n", average_mv_TMP); //check on the uart if the sampling is ok
                         //UART_PutString(message);
                         
-                        //slaveBuffer[MSB1]= 0x00; // save in the 4th register the MSB of the average
-                        //slaveBuffer[LSB1]= 0x00; // save in the 5th register the LSB of the average
+                        slaveBuffer[MSB1]= 0x00; // save in the 4th register the MSB of the average
+                        slaveBuffer[LSB1]= 0x00; // save in the 5th register the LSB of the average
                         slaveBuffer[MSB2]= average_digit_TMP >> 8; // save in the 6th register the MSB of the average
                         slaveBuffer[LSB2]= average_digit_TMP & 0xFF; // save in the 7th register the LSB of the average
-                        
-                        DataBuffer[1]= 0x00; 
-                        DataBuffer[2]= 0x00; 
-                        DataBuffer[3]= slaveBuffer[MSB2]; 
-                        DataBuffer[4]= slaveBuffer[LSB2];
-                        
-                        UART_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE);
-
+                    
                         sum_digit_TMP = 0;
                         num_samples = 0;
                     }
@@ -160,7 +152,7 @@ int main(void)
                 
             case SLAVE_LDR_ON_CTRL_REG1:
                 
-                Pin_LED_Write(0); //switch off the led 
+                Pin_LED_Write(0); //switch the led off
                 
                 if (ReadValue == 1) {
                     
@@ -176,17 +168,10 @@ int main(void)
                         
                         slaveBuffer[MSB1]= average_digit_LDR >> 8; // save in the 4th register the MSB of the average
                         slaveBuffer[LSB1]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
-                        //slaveBuffer[MSB2]= 0x00; // save in the 6th register the MSB of the average
-                        //slaveBuffer[LSB2]= 0x00; // save in the 7th register the LSB of the average
+                        slaveBuffer[MSB2]= 0x00; // save in the 6th register the MSB of the average
+                        slaveBuffer[LSB2]= 0x00; // save in the 7th register the LSB of the average
                         
-                        DataBuffer[1]= slaveBuffer[MSB1]; 
-                        DataBuffer[2]= slaveBuffer[LSB1]; 
-                        DataBuffer[3]= 0x00; 
-                        DataBuffer[4]= 0x00;
-                        
-                        UART_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE);
-
-                        sum_digit_TMP = 0;
+                        sum_digit_LDR = 0;
                         num_samples = 0;
                     }
                     
@@ -199,14 +184,12 @@ int main(void)
                 
             case SLAVE_MODE_OFF_CTRL_REG1:
                 
-                Pin_LED_Write(0);
-      
-                DataBuffer[1]= 0x00; 
-                DataBuffer[2]= 0x00; 
-                DataBuffer[3]= 0x00; 
-                DataBuffer[4]= 0x00;
+                Pin_LED_Write(0); //switch the led off
                 
-                UART_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE);
+                slaveBuffer[MSB1]= 0x00; // save in the 4th register the MSB of the average
+                slaveBuffer[LSB1]= 0x00; // save in the 5th register the LSB of the average
+                slaveBuffer[MSB2]= 0x00; // save in the 6th register the MSB of the average
+                slaveBuffer[LSB2]= 0x00; // save in the 7th register the LSB of the average
 
                 break;
         

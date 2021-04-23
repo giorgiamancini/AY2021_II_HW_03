@@ -16,11 +16,6 @@ interrupt routines header file
     #include "cytypes.h"
     #include "stdio.h"
     
-    #define BYTE_TO_SEND 4
-    #define TRANSMIT_BUFFER_SIZE 1+BYTE_TO_SEND+1 // number of bytes to transmit on bridge control panel
-    
-    uint8 DataBuffer[TRANSMIT_BUFFER_SIZE];
-    
     int32 value_digit_TMP;
     int32 value_digit_LDR;
     //int32 value_mv_LDR;
