@@ -39,29 +39,29 @@ file to define values of registers
     #define SLAVE_CTRL_REG2_ADDRESS 0x01
 
     /**
-    *   \brief 8 bit to set 5 samples and no sampling (status bit 1 = 0, status bit 0 = 0)
+    *   \brief 8 bit to set no sampling (status bit 1 = 0, status bit 0 = 0)
     **/
     #define SLAVE_MODE_OFF_CTRL_REG1 0x00
     
     /**
-    *   \brief 8 bit to set 5 samples and the LDR sampling on (status bit 1 = 0, status bit 0 = 1)
+    *   \brief 8 bit to set the LDR sampling on (status bit 1 = 0, status bit 0 = 1)
     **/
     #define SLAVE_LDR_ON_CTRL_REG1 0x01
     
     /**
-    *   \brief 8 bit to set 5 samples and the TMP sampling on (status bit 1 = 1, status bit 0 = 0)
+    *   \brief 8 bit to set the TMP sampling on (status bit 1 = 1, status bit 0 = 0)
     **/
     #define SLAVE_TMP_ON_CTRL_REG1 0x02
     
     /**
-    *   \brief 8 bit to set 5 samples and sampling both LDR and TMP (status bit 1 = 1, status bit 0 = 1)
+    *   \brief 8 bit to sampling both LDR and TMP (status bit 1 = 1, status bit 0 = 1)
     **/
     #define SLAVE_BOTH_ON_CTRL_REG1 0x03
     
     /**
-    *   \brief 8 bit frequency timer value of the Control Register 2
+    *   \brief 8 bit to set the timer period to 0 in the Control Register 2
     **/
-    #define SLAVE_FREQUENCY_CTRL_REG2 0x32 
+    #define SLAVE_MODE_OFF_CTRL_REG2 0x00 
     
 #endif
 

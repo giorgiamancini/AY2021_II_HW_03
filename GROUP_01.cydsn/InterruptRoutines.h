@@ -16,10 +16,8 @@ interrupt routines header file
     #include "cytypes.h"
     #include "stdio.h"
     
-    int32 value_digit_TMP;
-    int32 value_digit_LDR;
-    //int32 value_mv_LDR;
-    //int32 value_mv_TMP;
+    int32 value_digit_TMP;      //value in digit of TMP sensor from ADC
+    int32 value_digit_LDR;      //value in digit of LDR sensor from ADC
 
     CY_ISR_PROTO(Custom_ISR_ADC);
     
