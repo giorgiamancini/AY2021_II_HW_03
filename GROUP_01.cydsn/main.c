@@ -5,7 +5,8 @@ Academic Year 2020/2021 - II Semester
 Assignment 03
 GROUP_01 
 
-main source file
+main source file: It starts the general functionality of the project. 
+                  The average is calculated and stored adequately.  
  
  * ========================================
 */
@@ -60,7 +61,6 @@ int main(void)
     ADC_DelSig_Start();
     isr_ADC_StartEx(Custom_ISR_ADC);
     AMux_Start();
-    UART_Start();
     EZI2C_Start();
     
     ADC_DelSig_StartConvert(); // start ADC conversion
@@ -104,7 +104,8 @@ int main(void)
                     num_samples++;
                     
                     if (num_samples == average_samples){
-
+                        
+                        // calculate the average
                         average_digit_LDR = sum_digit_LDR / average_samples;
                         average_digit_TMP = sum_digit_TMP / average_samples;
 
@@ -112,7 +113,8 @@ int main(void)
                         slaveBuffer[LSB1]= average_digit_LDR & 0xFF;    // save in the 5th register the LSB of the average
                         slaveBuffer[MSB2]= average_digit_TMP >> 8;      // save in the 6th register the MSB of the average
                         slaveBuffer[LSB2]= average_digit_TMP & 0xFF;    // save in the 7th register the LSB of the average
-
+                        
+                        // reset the sum and sample count
                         sum_digit_LDR = 0;
                         sum_digit_TMP = 0;
                         num_samples = 0;
@@ -136,17 +138,15 @@ int main(void)
                     num_samples++;
                     
                     if (num_samples == average_samples){
-
+                        // calculate the average
                         average_digit_TMP = sum_digit_TMP / average_samples;
-                        
-                        //sprintf(message, "Tmp: %ld\r\n", average_mv_TMP); //check on the uart if the sampling is ok
-                        //UART_PutString(message);
-                        
-                        slaveBuffer[MSB1]= 0x00; // save in the 4th register the MSB of the average
-                        slaveBuffer[LSB1]= 0x00; // save in the 5th register the LSB of the average
+                                              
+                        slaveBuffer[MSB1]= 0x00; // save no value in the register
+                        slaveBuffer[LSB1]= 0x00; // save no value in the register
                         slaveBuffer[MSB2]= average_digit_TMP >> 8; // save in the 6th register the MSB of the average
                         slaveBuffer[LSB2]= average_digit_TMP & 0xFF; // save in the 7th register the LSB of the average
                     
+                        // reset the sum and sample count
                         sum_digit_TMP = 0;
                         num_samples = 0;
                     }
@@ -168,16 +168,15 @@ int main(void)
                     
                     if (num_samples == average_samples){
                         
+                        // calculate the average
                         average_digit_LDR = sum_digit_LDR / average_samples;
-                        
-                        //sprintf(message, "Tmp: %ld\r\n", average_mv_TMP); //check on the uart if the sampling is ok
-                        //UART_PutString(message);
-                        
+                                             
                         slaveBuffer[MSB1]= average_digit_LDR >> 8; // save in the 4th register the MSB of the average
                         slaveBuffer[LSB1]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
-                        slaveBuffer[MSB2]= 0x00; // save in the 6th register the MSB of the average
-                        slaveBuffer[LSB2]= 0x00; // save in the 7th register the LSB of the average
+                        slaveBuffer[MSB2]= 0x00; // save no value in the register
+                        slaveBuffer[LSB2]= 0x00; // save no value in the register
                         
+                        // reset the sum and sample count
                         sum_digit_LDR = 0;
                         num_samples = 0;
                     }
@@ -193,10 +192,10 @@ int main(void)
                 
                 Pin_LED_Write(OFF); //switch the led off
                 
-                slaveBuffer[MSB1]= 0x00; // save in the 4th register the MSB of the average
-                slaveBuffer[LSB1]= 0x00; // save in the 5th register the LSB of the average
-                slaveBuffer[MSB2]= 0x00; // save in the 6th register the MSB of the average
-                slaveBuffer[LSB2]= 0x00; // save in the 7th register the LSB of the average
+                slaveBuffer[MSB1]= 0x00; // save no value in the register
+                slaveBuffer[LSB1]= 0x00; // save no value in the register
+                slaveBuffer[MSB2]= 0x00; // save no value in the register
+                slaveBuffer[LSB2]= 0x00; // save no value in the register
 
                 break;
         

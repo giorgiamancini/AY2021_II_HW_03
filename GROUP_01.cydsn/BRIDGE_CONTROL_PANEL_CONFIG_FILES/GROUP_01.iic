@@ -1,0 +1,10 @@
+w 08 00 17 p
+w 08 01 14 p
+w 08 03 p
+r 08 @1LDR p
+w 08 04 p
+r 08 @0LDR p
+w 08 05 p
+r 08 @1TMP p
+w 08 06 p
+r 08 @0TMP p 
