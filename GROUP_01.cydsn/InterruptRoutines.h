@@ -7,6 +7,8 @@ GROUP_01
 
 interrupt routines header file
  
+- Custom_ISR_ADC: isr for sampling sensor value from ADC
+
  * ========================================
 */
 

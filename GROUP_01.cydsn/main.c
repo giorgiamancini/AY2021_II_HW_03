@@ -87,32 +87,34 @@ int main(void)
         //Read from the Control register 2 the timer period
         timer_period = slaveBuffer[CTRL_REG2];
         
-        //Write the timer period value to configure the timer to 50Hz
+        //Write the timer period value to configure the timer to the right frequency
         Timer_WritePeriod(timer_period);
-
+        
+        //Switch case to check the values of the status bits and sample the right signal(s)
         switch(status_bits){
             
             case SLAVE_BOTH_ON_CTRL_REG1:
                 
-                Pin_LED_Write(ON); // Switch the led on 
+                Pin_LED_Write(ON);                          // Switch the led on 
                 
-                if (ReadValue == 1) {
+                if (ReadValue == 1) {                       //check if the value is read from the ADC
                     
+                    //summing values for the average computation
                     sum_digit_LDR = sum_digit_LDR + value_digit_LDR;
                     sum_digit_TMP = sum_digit_TMP + value_digit_TMP;
                     
-                    num_samples++;
+                    num_samples++;                          //increase the number of samples to compute the average
                     
-                    if (num_samples == average_samples){
+                    if (num_samples == average_samples){    //check if the number of samples is the right one 
                         
                         // calculate the average
                         average_digit_LDR = sum_digit_LDR / average_samples;
                         average_digit_TMP = sum_digit_TMP / average_samples;
 
-                        slaveBuffer[MSB1]= average_digit_LDR >> 8;      // save in the 4th register the MSB of the average
-                        slaveBuffer[LSB1]= average_digit_LDR & 0xFF;    // save in the 5th register the LSB of the average
-                        slaveBuffer[MSB2]= average_digit_TMP >> 8;      // save in the 6th register the MSB of the average
-                        slaveBuffer[LSB2]= average_digit_TMP & 0xFF;    // save in the 7th register the LSB of the average
+                        slaveBuffer[MSB1]= average_digit_LDR >> 8;      // save in the 4th register the MSB of the ldr sensor average
+                        slaveBuffer[LSB1]= average_digit_LDR & 0xFF;    // save in the 5th register the LSB of the ldr sensor average
+                        slaveBuffer[MSB2]= average_digit_TMP >> 8;      // save in the 6th register the MSB of the tmp sensor average
+                        slaveBuffer[LSB2]= average_digit_TMP & 0xFF;    // save in the 7th register the LSB of the tmp sensor average
                         
                         // reset the sum and sample count
                         sum_digit_LDR = 0;
@@ -121,7 +123,7 @@ int main(void)
                     }
                     
                         
-                    ReadValue = 0; // Reset the flag for reading value
+                    ReadValue = 0;                          // Reset the flag for reading value
                     
                 }
                     
@@ -130,28 +132,31 @@ int main(void)
                 
             case SLAVE_TMP_ON_CTRL_REG1:
                 
-                Pin_LED_Write(OFF); //switch the led off
+                Pin_LED_Write(OFF);                         //switch the led off
                 
-                if (ReadValue == 1) {
+                if (ReadValue == 1) {                       //check if the value is read from the ADC
                 
+                    //summing values for the average computation
                     sum_digit_TMP = sum_digit_TMP + value_digit_TMP;
-                    num_samples++;
                     
-                    if (num_samples == average_samples){
+                    num_samples++;                          //increase the number of samples to compute the average
+                    
+                    if (num_samples == average_samples){    //check if the number of samples is the right one
+                        
                         // calculate the average
                         average_digit_TMP = sum_digit_TMP / average_samples;
                                               
-                        slaveBuffer[MSB1]= 0x00; // save no value in the register
-                        slaveBuffer[LSB1]= 0x00; // save no value in the register
-                        slaveBuffer[MSB2]= average_digit_TMP >> 8; // save in the 6th register the MSB of the average
-                        slaveBuffer[LSB2]= average_digit_TMP & 0xFF; // save in the 7th register the LSB of the average
+                        slaveBuffer[MSB1]= 0x00;                        // save no value in the register
+                        slaveBuffer[LSB1]= 0x00;                        // save no value in the register
+                        slaveBuffer[MSB2]= average_digit_TMP >> 8;      // save in the 6th register the MSB of the tmp sensor average
+                        slaveBuffer[LSB2]= average_digit_TMP & 0xFF;    // save in the 7th register the LSB of the tmp sensor average
                     
                         // reset the sum and sample count
                         sum_digit_TMP = 0;
                         num_samples = 0;
                     }
    
-                    ReadValue = 0; // Reset the flag for reading value
+                    ReadValue = 0;                          // Reset the flag for reading value
                     
                 }
                 
@@ -159,22 +164,24 @@ int main(void)
                 
             case SLAVE_LDR_ON_CTRL_REG1:
                 
-                Pin_LED_Write(OFF); //switch the led off
+                Pin_LED_Write(OFF);                         //switch the led off
                 
-                if (ReadValue == 1) {
+                if (ReadValue == 1) {                       //check if the value is read from the ADC
                     
+                    //summing values for the average computation
                     sum_digit_LDR = sum_digit_LDR + value_digit_LDR;
-                    num_samples++;
                     
-                    if (num_samples == average_samples){
+                    num_samples++;                          //increase the number of samples to compute the average
+                    
+                    if (num_samples == average_samples){    //check if the number of samples is the right one
                         
                         // calculate the average
                         average_digit_LDR = sum_digit_LDR / average_samples;
                                              
-                        slaveBuffer[MSB1]= average_digit_LDR >> 8; // save in the 4th register the MSB of the average
-                        slaveBuffer[LSB1]= average_digit_LDR & 0xFF; // save in the 5th register the LSB of the average
-                        slaveBuffer[MSB2]= 0x00; // save no value in the register
-                        slaveBuffer[LSB2]= 0x00; // save no value in the register
+                        slaveBuffer[MSB1]= average_digit_LDR >> 8;      // save in the 4th register the MSB of the ldr sensor average
+                        slaveBuffer[LSB1]= average_digit_LDR & 0xFF;    // save in the 5th register the LSB of the ldr sensor average
+                        slaveBuffer[MSB2]= 0x00;                        // save no value in the register
+                        slaveBuffer[LSB2]= 0x00;                        // save no value in the register
                         
                         // reset the sum and sample count
                         sum_digit_LDR = 0;
@@ -182,7 +189,7 @@ int main(void)
                     }
                     
                         
-                    ReadValue = 0; // Reset the flag for reading value
+                    ReadValue = 0;                          // Reset the flag for reading value
                     
                 }
                 
@@ -190,12 +197,12 @@ int main(void)
                 
             case SLAVE_MODE_OFF_CTRL_REG1:
                 
-                Pin_LED_Write(OFF); //switch the led off
+                Pin_LED_Write(OFF);                         //switch the led off
                 
-                slaveBuffer[MSB1]= 0x00; // save no value in the register
-                slaveBuffer[LSB1]= 0x00; // save no value in the register
-                slaveBuffer[MSB2]= 0x00; // save no value in the register
-                slaveBuffer[LSB2]= 0x00; // save no value in the register
+                slaveBuffer[MSB1]= 0x00;                                // save no value in the register
+                slaveBuffer[LSB1]= 0x00;                                // save no value in the register
+                slaveBuffer[MSB2]= 0x00;                                // save no value in the register
+                slaveBuffer[LSB2]= 0x00;                                // save no value in the register
 
                 break;
         
