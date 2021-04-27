@@ -4,7 +4,6 @@ w 08 00 17 p
 ; line to write the right value on the Control Reg2:
 ; 14 in hexadecimal permits to have 20 as timer period 
 ; 5000Hz is the clock frequency --> 5000/5samples*50Hz = 20 --> the isr goes at 4 ms to transmit the average of 5 samples at 50Hz
-
 w 08 01 14 p
 
 ; lines to visualize the signals in chart (select all the lines and click on Repeat)
@@ -18,15 +17,19 @@ w 08 06 p
 r 08 @0TMP p 
 
 ; if you want to change the transmission rate (T) you have consider this formula:
-; timer period = 5000Hz/T*samples
+; timer period = 5000Hz/T*samples (the timer period needs to be an integer)
 ; the frequency can vary between 10Hz and 100Hz and the samples between 2 and 10 
 
-; Example1: if you want 2 samples at 50Hz you have to write in the control reg2 the number 50 (5000/50*2 = 50)
-; and in the control reg1 the number to have 2 samples
+; Example1: if you want 2 samples at 10Hz you have to write in the control reg2 the number 250 (5000/10*2 = 250)
+; and in the control reg1 the number to have 2 samples and both channels activated 
 w 08 00 0B p
-w 08 01 32 p
+w 08 01 FA p
 
 ; Example2: if you want 10 samples at 100Hz you have to write in the control reg2 the number 5 (5000/100*10 = 5)
-; and in the control reg1 the number to have 10 samples
+; and in the control reg1 the number to have 10 samples and both channels activated
 w 08 00 2B p
 w 08 01 05 p
+
+; if you want to sample only one sensor you can change the value of the status bits into the control reg1
+; to sample only the temperature sensor with 5 samples: w 08 00 16 p
+; to sample only the ldr sensor with 5 samples: w 08 00 15 p 

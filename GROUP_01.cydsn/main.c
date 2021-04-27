@@ -15,7 +15,6 @@ main source file: It starts the general functionality of the project.
 #include "project.h"
 #include "InterruptRoutines.h"
 #include "RegAddress.h"
-#include "stdio.h"
 
 //Define structure of slave buffer
 #define SLAVE_BUFFER_SIZE 7     //number of registers
